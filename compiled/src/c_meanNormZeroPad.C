@@ -28,7 +28,7 @@
 
 using namespace boost::python; //for some reason....
 
-static TString treename="deepntuplizer/tree";
+static TString treename="ttree";
 
 
 enum modeen {en_flat,en_particlewise};

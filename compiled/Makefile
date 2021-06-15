@@ -24,29 +24,29 @@ classdict.cxx: src/LinkDef.h
 	rootcling -v4 -f $@  -rmf classdict.rootmap -rml classdict.so  $^
 
 classdict.so: classdict.cxx
-	g++ $(CFLAGS) $(ROOTCFLAGS) $(ROOTSTUFF) -std=c++11 -fPIC -shared -o classdict.so classdict.cxx 	
+	g++ -o classdict.so classdict.cxx $(CFLAGS) $(ROOTCFLAGS) $(ROOTSTUFF) -std=c++11 -fPIC -shared 	
 
 
 %: to_bin/%.cpp libdeepjetcorehelpers.so classdict.cxx
-	g++ $(CFLAGS) -I./interface $(LINUXADD) $(PYTHON_INCLUDE) $< -L. -ldeepjetcorehelpers -lquicklz  $(PYTHON_LIB) -lboost_python3 -lboost_numpy3 $(ROOTCFLAGS) $(ROOTSTUFF)   -o  $@  
+	g++ -o $@ $(CFLAGS) -I./interface $(LINUXADD) $(PYTHON_INCLUDE) $< -L. -ldeepjetcorehelpers -lquicklz $(PYTHON_LIB) -lboost_python3 -lboost_numpy3 $(ROOTCFLAGS) $(ROOTSTUFF)    
 	mv $@ ../bin/
 
 #helpers
 libquicklz.so:
-	gcc -shared -O2 -fPIC src/quicklz.c -o libquicklz.so
+	gcc -o libquicklz.so -shared -O2 -fPIC src/quicklz.c 
 
 obj/%.o: src/%.cpp
-	g++ $(CFLAGS) $(PYTHON_INCLUDE) $(ROOTCFLAGS) -I./interface -O2 -fPIC -c -o $@ $< 
+	g++ -o $@ $< $(CFLAGS) $(PYTHON_INCLUDE) $(ROOTCFLAGS) -I./interface -O2 -fPIC -c  
 
 #pack helpers in lib
 libdeepjetcorehelpers.so: $(OBJ_FILES) 
-	g++ -o $@ -shared -fPIC  $(LINUXADD) $(CFLAGS) -fPIC  obj/*.o $(ROOTSTUFF) $(PYTHON_LIB) -lboost_python3 -lboost_numpy3 
+	g++ -o $@ -shared -fPIC $(LINUXADD) $(CFLAGS) -fPIC  obj/*.o $(ROOTSTUFF) $(PYTHON_LIB) -lboost_python3 -lboost_numpy3 
 
 %.so: %.o libdeepjetcorehelpers.so libquicklz.so
 	g++  -o $(@) -shared -g -fPIC $(CFLAGS) $(LINUXADD) $<   $(ROOTSTUFF) -L./ -lquicklz  $(PYTHON_LIB) -lboost_python3 -lboost_numpy3 -L./ -ldeepjetcorehelpers 
 
 %.o: src/%.C 
-	g++   $(ROOTCFLAGS) -O2 -g -I./interface $(PYTHON_INCLUDE) -fPIC $(CFLAGS) -c -o $(@) $<
+	g++ -fPIC -o $(@) $< $(ROOTCFLAGS) -O2 -g -I./interface $(PYTHON_INCLUDE) $(CFLAGS) -c 
 
 
 
