@@ -96,7 +96,7 @@ public:
 
     void prepareNextEpoch();
 
-    void shuffleFileList();
+    void shuffleFilelist();
 
     void end();
     /**

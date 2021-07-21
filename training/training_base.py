@@ -501,7 +501,7 @@ class training_base(object):
                                      **trainargs
                 )
                 self.trainedepoches += 1
-                traingen.shuffleFileList()
+                traingen.shuffleFilelist()
                 #
         
             self.saveModel("KERAS_model.h5")
