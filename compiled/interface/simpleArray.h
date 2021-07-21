@@ -666,8 +666,6 @@ simpleArray<T> simpleArray<T>::split(size_t splitindex) {
     ///
     out.size_ = sizeFromShape(out.shape_);
     size_ = sizeFromShape(shape_);
-    out.featnames_ = featnames_;
-    out.name_ = name_;
     return out;
 }
 
@@ -725,9 +723,6 @@ simpleArray<T> simpleArray<T>::getSlice(size_t splitindex_begin, size_t splitind
     }
     ///
     out.size_ = sizeFromShape(out.shape_);
-    out.name_ = name_;
-    out.featnames_ = featnames_;
-
     return out;
 
 }
