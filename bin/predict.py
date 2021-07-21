@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 from argparse import ArgumentParser
 
 
@@ -89,7 +90,7 @@ for inputfile in inputdatafiles:
             td.readFromFileBuffered(use_inputdir+"/"+inputfile)
     else:
         print('converting '+inputfile)
-        td.readFromSourceFile(use_inputdir+"/"+inputfile, dc.weighterobjects, istraining=False)
+        td.readFromSourceFile(os.path.join(use_inputdir, inputfile), dc.weighterobjects, istraining=False)
     
 
     gen = TrainDataGenerator()
@@ -100,6 +101,7 @@ for inputfile in inputdatafiles:
     gen.setSquaredElementsLimit(dc.batch_uses_sum_of_squares)
     gen.setSkipTooLargeBatches(False)
     gen.setBuffer(td)
+
     
     predicted = model.predict_generator(gen.feedNumpyData(),
                                         steps=gen.getNBatches(),
@@ -116,7 +118,7 @@ for inputfile in inputdatafiles:
     
     if not type(predicted) == list: #circumvent that keras return only an array if there is just one list item
         predicted = [predicted]   
-    overwrite_outname = td.writeOutPrediction(predicted, x, y, w, args.outputDir + "/" + outfilename, use_inputdir+"/"+inputfile)
+    overwrite_outname = td.writeOutPrediction(predicted, x, y, w, os.path.join(args.outputDir, outfilename), os.path.join(use_inputdir, inputfile))
     if overwrite_outname is not None:
         outfilename = overwrite_outname
     outputs.append(outfilename)

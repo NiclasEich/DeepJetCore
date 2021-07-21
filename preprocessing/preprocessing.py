@@ -102,12 +102,16 @@ def meanNormProd(Tuple):
     stddev = ()
     formats = ' '
     names = ' '
+    # from IPython import embed;embed()
     for name in iter (BranchList):
         # check if scalat or array, arrays are stored as object
         if Tuple[[name]].dtype[0]=='object':
             #        if Tuple[name][0].size>1 or 'sv_' in name :
             # makeov it a simple standard array
-            chain = numpy.concatenate(Tuple[name])
+            try:
+                chain = numpy.concatenate(Tuple[name])
+            except ValueError:
+                chain = numpy.hstack(Tuple[name])
             # check for crazy entries
             chainsize = chain.size
             chain = chain[numpy.invert( numpy.isinf( chain[:] )) ]
@@ -504,8 +508,13 @@ def MeanNormZeroPad(Filename_in,MeanNormTuple,inbranches_listlist,nMaxslist,neve
             totallengthperjet+=len(inbranches_listlist[i])*nMaxslist[i]
         else:
             totallengthperjet+=len(inbranches_listlist[i]) #flat branch
-    
-    
+    print("DEBUGGING nMaxslist\n\n")
+    # print("inbarnches_listlsit\n", inbranches_listlist)
+    for inb, nM in zip( inbranches_listlist, nMaxslist):
+        print("Max: {}\n{}\n".format(inb, nM))
+    # print(nMaxslist)
+    print("DEBUGGING HERE IS POSSIBLE")
+    print("totatl length per jet: {}".format(totallengthperjet))
     
     #numpy.set_printoptions(threshold=10000)
     
