@@ -24,18 +24,30 @@ Setup
 
 The package comes with a docker file in the subdirectory docker, which will set up a container with the needed environment.
 
-**Building / using the container** 
-For every release, there is a container on dockerhub, the latest release is tagged. The ``latest`` tag refers to the developing master branch.
-``cernml4reco/deepjetcore3:latest``
-It can be pulled using docker, or pulled from singularity. For details, please see the corresponding docker or singularity documentation.
-To build the container, the files can be found in the ``docker`` subdirectory. It is a two-stage process. First the container ``Dockerfile_base`` needs to be built, containing the basic system packages. This will take a while, because root is being compiled within. The output container name must be ``cernml4reco/djcbase:py3``. In the next step, the actual DeepJetCore container should be built on top. **Please make sure to use a release, not the developing master branch!**
 
+**Users with access to cvmfs** (e.g. on lxplus or other CERN machines) will find a pre-built singularity container here:
+``/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cernml4reco/deepjetcore3:latest``
 
-**Users with access to Cernbox** can just run the container through the prepared script at:
-``/eos/home-j/jkiesele/singularity/run_deepjetcore3.sh``
-If you are running on lxplus7, you can instead run:
-``/eos/home-j/jkiesele/singularity/run_deepjetcore3_lxplus.sh``
-Every user who has subscribed to the e-group ml-deepjetcore will have read access to the containers.
+A good way to enter the container interactively, mounting for example the standard directories on lxplus or similar machines would be:
+```
+#!/bin/bash
+
+gpuopt=""
+files=$(ls -l /dev/nvidia* 2> /dev/null | egrep -c '\n')
+if [[ "$files" != "0" ]]
+then
+gpuopt="--nv"
+fi
+
+#this is a singularity problem only fixed recently
+unset LD_LIBRARY_PATH
+unset PYTHONPATH
+sing=`which singularity`
+unset PATH
+cd
+
+$sing run -B /eos -B /afs $gpuopt /cvmfs/unpacked.cern.ch/registry.hub.docker.com/cernml4reco/deepjetcore3:latest
+```
 
 The cache dir can get rather large and is normally located at ~/.singularity/cache. To avoid filling up the home afs, the cache can be set to /tmp or the work afs. Once the container is fully closed, the cache can be safely deleted. Singularity reacts to environment variables, e.g.
 
@@ -43,10 +55,18 @@ The cache dir can get rather large and is normally located at ~/.singularity/cac
 export SINGULARITY_CACHEDIR="/tmp/$(whoami)/singularity"
 ```
 
-Sometimes you need to try two or three times - singularity is a bit weird. But once the contaienr is launched, everything works smoothly.
+Sometimes you need to try a few times - singularity is a bit weird. But once the container is launched, everything works smoothly.
 The message about a missing user group can be safely ignored.
 
-**It is important** that your bashrc does not reset the ``LD_LIBRARY`` or ``PYTHONPATH`` environment variables. Also **remove any anaconda paths from your bashrc**, because they will reset ``LD_LIBRARY`` and ``PYTHONPATH``. THe system needs to be in a clean environment state within the container (as it should be).
+**It is important** that your bashrc does not change or reset the ``LD_LIBRARY`` or ``PYTHONPATH`` environment variables. Also **remove any anaconda paths from your bashrc**, because they will reset ``LD_LIBRARY`` and ``PYTHONPATH``. The system needs to be in a clean environment state within the container (as it should be).
+
+
+**Building / using the container** 
+For users without access to cvmfs, the container can be built manually or pulled from dockerhub. For every release, there is a container on dockerhub, the latest release is tagged. The ``latest`` tag refers to the developing master branch.
+``cernml4reco/deepjetcore3:latest``
+It can be pulled using docker, or pulled from singularity. For details, please see the corresponding docker or singularity documentation.
+To build the container, the files can be found in the ``docker`` subdirectory. It is a two-stage process. First the container ``Dockerfile_base`` needs to be built, containing the basic system packages. This will take a while, because root is being compiled within. The output container name must be ``cernml4reco/djcbase:cu11.1``. In the next step, the actual DeepJetCore container should be built on top. **Please make sure to use a release, not the developing master branch!**
+
 
 **Building with conda**
 In case of lack of access to singularity or docker, it's possible to build the environment using conda. This _should_ work anywhere since conda
@@ -154,7 +174,7 @@ gen = train_data.invokeGenerator()
 
 # loop over epochs here ...
 
-gen.shuffleFilelist()
+gen.shuffleFileList()
 gen.prepareNextEpoch()
 
 # this number can differ from epoch to epoch for ragged data!

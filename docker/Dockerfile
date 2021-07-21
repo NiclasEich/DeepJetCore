@@ -17,6 +17,8 @@ RUN cd /usr/local/lib/python3.6/dist-packages/tensorflow/include/third_party && 
     cd gpus && \
     ln -s /usr/local/cuda cuda    
     
+RUN ln -s /usr/local/cuda-11.1/lib64/libcusolver.so.11 /usr/local/cuda-11.1/lib64/libcusolver.so.10
+    
     
 ################################################################################
 # the actual DeepJetCore. Make sure this gets built every time
@@ -55,6 +57,16 @@ RUN git clone https://github.com/google/qkeras &&\
     cd qkeras &&\
     python3 setup.py build &&\
     python3 setup.py install 
-    
+      
+
+#some more useful packages
+RUN pip3 install bayesian-optimization mgzip mysql-connector-python
+
+
+# HLS4ML
+RUN pip3 install git+https://github.com/fastmachinelearning/hls4ml.git#egg=hls4ml[profiling]  
+RUN pip3 install git+https://github.com/thesps/conifer.git
+
+
 
     
