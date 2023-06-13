@@ -67,8 +67,9 @@ class TrainData(trainData):
         else:
             raise ValueError("TrainData._convertToCppType MUST produce either a list of numpy arrays or a list of DeepJetCore simpleArrays!")
         
-        if saout.hasNanOrInf():
-            raise ValueError("TrainData._convertToCppType: the "+helptext+" array "+saout.name()+" has NaN or inf entries")
+        if getattr(saout, "hasNanOrInf", None) is not None:
+            if saout.hasNanOrInf():
+                raise ValueError("TrainData._convertToCppType: the "+helptext+" array "+saout.name()+" has NaN or inf entries")
         return saout
             
     def _store(self, x, y, w):
